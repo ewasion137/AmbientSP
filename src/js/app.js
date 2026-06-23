@@ -29,6 +29,33 @@ const cardsMap = {};
 document.getElementById('btnMinimize').addEventListener('click', () => window.electronAPI.minimize());
 document.getElementById('btnTray').addEventListener('click', () => window.electronAPI.hideToTray());
 document.getElementById('btnClose').addEventListener('click', () => window.electronAPI.close());
+document.getElementById('btnReset').addEventListener('click', () => {
+    resetAllSounds();
+});
+
+// Функция полного сброса
+function resetAllSounds() {
+    soundNames.forEach(name => {
+        const cardData = cardsMap[name];
+        if (cardData) {
+            // Останавливаем аудио, если оно играло
+            if (cardData.audio) {
+                cardData.audio.pause();
+                cardData.audio = null;
+            }
+            // Сбрасываем статус активности карточки в коде и визуально
+            cardData.active = false;
+            cardData.cardElement.classList.remove('active');
+            
+            // Возвращаем слайдер громкости на дефолтные 50%
+            cardData.slider.value = 0.5;
+        }
+    });
+    
+    // Полностью удаляем файл сохранения из памяти
+    localStorage.removeItem('ambientSP_save');
+}
+
 
 // Слушаем сигнал из трея "Mute All Sounds"
 window.electronAPI.onMuteAll(() => {

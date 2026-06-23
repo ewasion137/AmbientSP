@@ -230,3 +230,31 @@ body {
 .volume-slider::-webkit-slider-thumb:hover {
     transform: scale(1.2);
 }
+
+.title-bar-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    -webkit-app-region: no-drag; /* Кнопки должны быть кликабельными */
+}
+
+/* Кнопка сброса */
+.reset-btn {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: #8a8a9a;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.reset-btn:hover {
+    background: rgba(255, 74, 74, 0.1);
+    border-color: rgba(255, 74, 74, 0.25);
+    color: #ff4a4a;
+}
