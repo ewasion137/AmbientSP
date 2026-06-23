@@ -1,0 +1,117 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background: #0f0f12; /* Темный глубокий фон */
+    color: #ffffff;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding: 40px 20px;
+    overflow-y: auto;
+    user-select: none;
+}
+
+.app-container {
+    width: 100%;
+    max-width: 1000px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+header {
+    text-align: center;
+}
+
+.logo-text {
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: #ffffff;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+/* Сетка карточек */
+.sounds-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 20px;
+    width: 100%;
+}
+
+/* Карточка звука */
+.sound-card {
+    position: relative;
+    height: 140px;
+    border-radius: 16px;
+    overflow: hidden;
+    cursor: pointer;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+    transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1), border-color 0.3s, box-shadow 0.3s;
+}
+
+/* Эффект при наведении */
+.sound-card:hover {
+    transform: scale(1.04);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Активное состояние (когда звук играет) */
+.sound-card.active {
+    border-color: #00ffcc;
+    box-shadow: 0 0 20px rgba(0, 255, 204, 0.3);
+}
+
+/* Фоновая картинка с размытием по Гауссу */
+.sound-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    filter: blur(4px) brightness(0.4); /* Размытие + затемнение фона */
+    transition: filter 0.3s ease;
+    z-index: 1;
+}
+
+/* Когда карточка активна, картинка становится чуть четче и ярче */
+.sound-card.active .sound-bg {
+    filter: blur(2px) brightness(0.5);
+}
+
+/* Текст поверх картинки со свечением (Glow) */
+.sound-title {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+    font-size: 1.15rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-align: center;
+    width: 90%;
+    pointer-events: none; /* Чтобы клик проходил сквозь текст на карточку */
+    
+    color: #ffffff;
+    /* Дефолтное белое свечение */
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.6), 
+                 0 0 15px rgba(255, 255, 255, 0.3);
+    transition: color 0.3s, text-shadow 0.3s;
+}
+
+/* Бирюзовое свечение при активации */
+.sound-card.active .sound-title {
+    color: #00ffcc;
+    text-shadow: 0 0 10px rgba(0, 255, 204, 0.8), 
+                 0 0 20px rgba(0, 255, 204, 0.5);
+}
