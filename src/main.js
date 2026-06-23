@@ -7,9 +7,9 @@ let tray = null;
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 900,
-    height: 450,
-    frame: false, // Отключаем стандартный топ-бар ОС
-    resizable: false, // Запрещаем ресайз окна
+    height: 450, // Компактное окно для удобного скролла
+    frame: false,
+    resizable: false,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: false,
@@ -24,25 +24,57 @@ function createWindow() {
   });
 }
 
-// Функция создания системного трея
 function createTray() {
-  // Для иконки трея берем твой rain.jpg (Electron сам его сожмет до нужного размера).
-  // Позже ты сможешь заменить его на прозрачную иконку tray-icon.png
   const iconPath = path.join(__dirname, 'assets', 'rain.jpg'); 
-  
   tray = new Tray(iconPath);
   
+  updateTrayMenu();
+
+  tray.setToolTip('Ambient Sound Player');
+  
+  tray.on('click', () => {
+    if (mainWindow) {
+      mainWindow.show();
+      mainWindow.setSkipTaskbar(false);
+    }
+  });
+}
+
+function updateTrayMenu() {
+  if (!tray) return;
+
+  const loginSettings = app.getLoginItemSettings();
+
   const contextMenu = Menu.buildFromTemplate([
     { 
-      label: 'Открыть AmbientSP', 
+      label: 'Open AmbientSP', 
       click: () => {
         mainWindow.show();
         mainWindow.setSkipTaskbar(false);
       } 
     },
+    {
+      label: 'Mute All Sounds',
+      click: () => {
+        if (mainWindow) {
+          mainWindow.webContents.send('mute-all-sounds');
+        }
+      }
+    },
+    {
+      label: 'Launch at Startup',
+      type: 'checkbox',
+      checked: loginSettings.openAtLogin,
+      click: (menuItem) => {
+        app.setLoginItemSettings({
+          openAtLogin: menuItem.checked,
+          path: process.execPath
+        });
+      }
+    },
     { type: 'separator' },
     { 
-      label: 'Выход', 
+      label: 'Exit', 
       click: () => {
         app.isQuitting = true;
         app.quit();
@@ -50,14 +82,7 @@ function createTray() {
     }
   ]);
 
-  tray.setToolTip('Ambient Sound Player');
   tray.setContextMenu(contextMenu);
-
-  // Восстановление окна по клику на иконку в трее
-  tray.on('click', () => {
-    mainWindow.show();
-    mainWindow.setSkipTaskbar(false);
-  });
 }
 
 app.whenReady().then(() => {
@@ -71,7 +96,6 @@ app.whenReady().then(() => {
   });
 });
 
-// Обработка команд (IPC) от интерфейса
 ipcMain.on('window-minimize', () => {
   if (mainWindow) mainWindow.minimize();
 });
@@ -79,17 +103,16 @@ ipcMain.on('window-minimize', () => {
 ipcMain.on('window-hide-to-tray', () => {
   if (mainWindow) {
     mainWindow.hide();
-    mainWindow.setSkipTaskbar(true); // Убираем иконку снизу с панели задач
+    mainWindow.setSkipTaskbar(true);
   }
 });
 
 ipcMain.on('window-close', () => {
-  // Полностью закрываем приложение при нажатии на крестик
   app.quit();
 });
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
-    // Не закрываем процесс, если окно просто скрыто в трей
+    // Keep running in tray
   }
 });

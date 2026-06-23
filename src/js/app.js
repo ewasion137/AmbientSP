@@ -1,5 +1,4 @@
-// Просто добавляй новые названия звуков сюда! 
-// Главное, чтобы в assets лежали файлы {имя}.mp3 и {имя}.jpg
+// Полный обновленный список твоих 18 звуков
 const soundNames = [
     'river',
     'stream',
@@ -22,7 +21,6 @@ const soundNames = [
 ];
 
 const soundsGrid = document.getElementById('soundsGrid');
-const dynamicBg = document.getElementById('dynamicBg');
 
 // Объект, хранящий информацию о карточках и аудио
 const cardsMap = {};
@@ -32,45 +30,16 @@ document.getElementById('btnMinimize').addEventListener('click', () => window.el
 document.getElementById('btnTray').addEventListener('click', () => window.electronAPI.hideToTray());
 document.getElementById('btnClose').addEventListener('click', () => window.electronAPI.close());
 
-// Слушаем сигнал из трея "Выключить все звуки"
+// Слушаем сигнал из трея "Mute All Sounds"
 window.electronAPI.onMuteAll(() => {
     muteAllSounds();
 });
 
-function capitalizeFirstLetter(string) {
-    return string.charAt(0).toUpperCase() + string.slice(1);
-}
-
-// Умный расчет инвертированного цвета картинки через скрытый Canvas
-function getInvertedColor(imagePath) {
-    return new Promise((resolve) => {
-        const img = new Image();
-        img.src = imagePath;
-        img.onload = () => {
-            const canvas = document.createElement('canvas');
-            canvas.width = 1;
-            canvas.height = 1;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, 1, 1);
-            
-            // Получаем средний цвет картинки
-            const imgData = ctx.getImageData(0, 0, 1, 1).data;
-            const r = imgData[0];
-            const g = imgData[1];
-            const b = imgData[2];
-
-            // Рассчитываем инвертированный цвет
-            const invR = 255 - r;
-            const invG = 255 - g;
-            const invB = 255 - b;
-
-            resolve(`rgb(${invR}, ${invG}, ${invB})`);
-        };
-        img.onerror = () => {
-            // Дефолтный бирюзовый цвет, если картинка не загрузилась
-            resolve('rgb(0, 255, 204)');
-        };
-    });
+// Умная капитализация: "rain in car" -> "Rain In Car"
+function capitalizeWords(string) {
+    return string.split(' ')
+                 .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                 .join(' ');
 }
 
 // Сохранение состояния в LocalStorage
@@ -78,10 +47,12 @@ function saveCurrentState() {
     const state = {};
     soundNames.forEach(name => {
         const cardData = cardsMap[name];
-        state[name] = {
-            active: cardData.active,
-            volume: cardData.slider.value
-        };
+        if (cardData) {
+            state[name] = {
+                active: cardData.active,
+                volume: cardData.slider.value
+            };
+        }
     });
     localStorage.setItem('ambientSP_save', JSON.stringify(state));
 }
@@ -94,45 +65,28 @@ function loadSavedState() {
     try {
         const state = JSON.parse(saved);
         soundNames.forEach(name => {
-            if (state[name]) {
+            if (state[name] && cardsMap[name]) {
                 const cardData = cardsMap[name];
                 cardData.slider.value = state[name].volume;
                 if (state[name].active) {
-                    toggleSound(name, true); // включаем сохраненный звук
+                    toggleSound(name, true);
                 }
             }
         });
     } catch (e) {
-        console.error('Ошибка загрузки сохранения:', e);
+        console.error('Error loading saved state:', e);
     }
 }
 
-// Выключить абсолютно все звуки
+// Выключить все звуки
 function muteAllSounds() {
     soundNames.forEach(name => {
         const cardData = cardsMap[name];
-        if (cardData.active) {
+        if (cardData && cardData.active) {
             toggleSound(name, false);
         }
     });
     saveCurrentState();
-}
-
-// Обновление разделенного анимированного фона
-function updateDynamicBackground() {
-    // Получаем список только активных звуков
-    const activeSounds = soundNames.filter(name => cardsMap[name].active);
-    
-    // Очищаем фоновый контейнер
-    dynamicBg.innerHTML = '';
-
-    // Заполняем его анимированными срезами
-    activeSounds.forEach(name => {
-        const slice = document.createElement('div');
-        slice.className = 'bg-slice';
-        slice.style.backgroundImage = `url('assets/${name}.jpg')`;
-        dynamicBg.appendChild(slice);
-    });
 }
 
 // Генерация карточек
@@ -143,18 +97,12 @@ soundNames.forEach(name => {
 
     const bg = document.createElement('div');
     bg.className = 'sound-bg';
-    const bgPath = `assets/${name}.jpg`;
-    bg.style.backgroundImage = `url('${bgPath}')`;
+    bg.style.backgroundImage = `url('assets/${name}.jpg')`;
     card.appendChild(bg);
-
-    // Рассчитываем инвертированный цвет и вешаем его на карточку в CSS переменные
-    getInvertedColor(bgPath).then(color => {
-        card.style.setProperty('--active-color', color);
-    });
 
     const title = document.createElement('span');
     title.className = 'sound-title';
-    title.textContent = capitalizeFirstLetter(name);
+    title.textContent = capitalizeWords(name);
     card.appendChild(title);
 
     const volumeContainer = document.createElement('div');
@@ -171,7 +119,7 @@ soundNames.forEach(name => {
     volumeContainer.appendChild(slider);
     card.appendChild(volumeContainer);
 
-    // Инициализируем данные карточки в карту
+    // Добавляем карточку в наш реестр
     cardsMap[name] = {
         cardElement: card,
         slider: slider,
@@ -179,11 +127,11 @@ soundNames.forEach(name => {
         active: false
     };
 
-    // Событие слайдера громкости
+    // Изменение громкости ползунком
     slider.addEventListener('input', (e) => {
         const volume = e.target.value;
         const cardData = cardsMap[name];
-        if (cardData.audio) {
+        if (cardData && cardData.audio) {
             cardData.audio.volume = volume;
         }
         saveCurrentState();
@@ -191,22 +139,24 @@ soundNames.forEach(name => {
 
     slider.addEventListener('click', (e) => e.stopPropagation());
 
-    // Событие клика по карточке
+    // Клик по карточке (вкл/выкл)
     card.addEventListener('click', () => {
         const cardData = cardsMap[name];
-        toggleSound(name, !cardData.active);
-        saveCurrentState();
+        if (cardData) {
+            toggleSound(name, !cardData.active);
+            saveCurrentState();
+        }
     });
 
     soundsGrid.appendChild(card);
 });
 
-// Функция включения/выключения конкретного звука
+// Функция включения/выключения звука
 function toggleSound(name, forceState) {
     const cardData = cardsMap[name];
+    if (!cardData) return;
     
     if (forceState === true) {
-        // Включаем
         if (!cardData.audio) {
             cardData.audio = new Audio(`assets/${name}.mp3`);
             cardData.audio.loop = true;
@@ -215,21 +165,18 @@ function toggleSound(name, forceState) {
                 .then(() => {
                     cardData.active = true;
                     cardData.cardElement.classList.add('active');
-                    updateDynamicBackground();
                 })
-                .catch(err => console.error(`Ошибка запуска звука ${name}:`, err));
+                .catch(err => console.error(`Error playing sound ${name}:`, err));
         }
     } else {
-        // Выключаем
         if (cardData.audio) {
             cardData.audio.pause();
             cardData.audio = null;
             cardData.active = false;
             cardData.cardElement.classList.remove('active');
-            updateDynamicBackground();
         }
     }
 }
 
-// Запускаем восстановление сохраненного состояния после рендера карточек
+// Запуск восстановления сохраненного состояния
 loadSavedState();
