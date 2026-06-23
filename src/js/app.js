@@ -10,7 +10,8 @@ const soundNames = [
     'ocean',
     'rain',
     'rain in car',
-    'rain window'
+    'rain window',
+    'highway'
 ];
 
 const soundsGrid = document.getElementById('soundsGrid');
