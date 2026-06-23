@@ -4,12 +4,54 @@
   "description": "Ambient Sound Player",
   "main": "src/main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "build": "electron-builder --windows"
   },
-  "keywords": [],
+  "keywords": [
+    "ambient",
+    "noise",
+    "focus",
+    "mixer",
+    "sound-player"
+  ],
   "author": "ewasion137",
-  "license": "GPLv2",
+  "license": "GPL-2.0-only",
   "devDependencies": {
-    "electron": "^31.0.0" 
+    "electron": "^31.0.0",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.ewasion137.ambientsp",
+    "productName": "AmbientSP",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "src/**/*"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "logo.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "AmbientSP"
+    }
   }
 }
