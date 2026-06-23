@@ -1,0 +1,15 @@
+{
+  "name": "ambientsp",
+  "version": "1.0.0",
+  "description": "Ambient Sound Player",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "keywords": [],
+  "author": "ewasion137",
+  "license": "GPLv2",
+  "devDependencies": {
+    "electron": "^31.0.0" 
+  }
+}
