@@ -10,6 +10,7 @@ function createWindow() {
     height: 450, // Компактное окно для удобного скролла
     frame: false,
     resizable: false,
+    icon: path.join(__dirname, 'logo', 'logo.png'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: false,
@@ -25,7 +26,7 @@ function createWindow() {
 }
 
 function createTray() {
-  const iconPath = path.join(__dirname, 'assets', 'rain.jpg'); 
+  const iconPath = path.join(__dirname, 'logo', 'logo.png'); 
   tray = new Tray(iconPath);
   
   updateTrayMenu();
