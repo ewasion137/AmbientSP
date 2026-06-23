@@ -14,7 +14,9 @@ const soundNames = [
     'highway',
     'train',
     'keyboard',
-    'pink noise'
+    'pink noise',
+    'white noise',
+    'brown noise'
 ];
 
 const soundsGrid = document.getElementById('soundsGrid');
