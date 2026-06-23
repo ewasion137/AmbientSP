@@ -1,4 +1,3 @@
-// Список всех звуков, которые у нас есть в папке assets
 const soundNames = [
     'river',
     'stream',
@@ -14,64 +13,92 @@ const soundNames = [
 
 const soundsGrid = document.getElementById('soundsGrid');
 
-// Объект, где мы будем хранить запущенные аудио-элементы
-const activeAudios = {};
+// Подвязываем кастомные кнопки окна к Electron API
+document.getElementById('btnMinimize').addEventListener('click', () => {
+    window.electronAPI.minimize();
+});
 
-// Функция для перевода первой буквы в верхний регистр
+document.getElementById('btnTray').addEventListener('click', () => {
+    window.electronAPI.hideToTray();
+});
+
+document.getElementById('btnClose').addEventListener('click', () => {
+    window.electronAPI.close();
+});
+
 function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
 // Генерация карточек
 soundNames.forEach(name => {
-    // 1. Создаем элемент карточки
     const card = document.createElement('div');
     card.className = 'sound-card';
     card.dataset.sound = name;
 
-    // 2. Создаем размытый фон (картинку)
     const bg = document.createElement('div');
     bg.className = 'sound-bg';
-    // Путь к картинке в папке assets
     bg.style.backgroundImage = `url('assets/${name}.jpg')`;
     card.appendChild(bg);
 
-    // 3. Создаем текст со свечением
     const title = document.createElement('span');
     title.className = 'sound-title';
     title.textContent = capitalizeFirstLetter(name);
     card.appendChild(title);
 
-    // 4. Логика клика (включение/выключение звука)
-    card.addEventListener('click', () => {
-        toggleSound(name, card);
+    // Создаем контейнер для слайдера громкости
+    const volumeContainer = document.createElement('div');
+    volumeContainer.className = 'volume-container';
+
+    const slider = document.createElement('input');
+    slider.type = 'range';
+    slider.className = 'volume-slider';
+    slider.min = '0';
+    slider.max = '1';
+    slider.step = '0.01';
+    slider.value = '0.5'; // Громкость по умолчанию 50%
+
+    volumeContainer.appendChild(slider);
+    card.appendChild(volumeContainer);
+
+    // Ссылка на объект аудио для этой конкретной карточки
+    let audio = null;
+
+    // Регулировка громкости слайдером
+    slider.addEventListener('input', (e) => {
+        if (audio) {
+            audio.volume = e.target.value;
+        }
     });
 
-    // Добавляем готовую карточку в сетку
+    // Важно: останавливаем всплытие клика!
+    // Без этого клик по слайдеру будет выключать/включать всю карточку.
+    slider.addEventListener('click', (e) => {
+        e.stopPropagation();
+    });
+
+    // Логика клика по карточке (вкл/выкл звука)
+    card.addEventListener('click', () => {
+        if (audio) {
+            // Если звук играет — выключаем его
+            audio.pause();
+            audio = null;
+            card.classList.remove('active');
+        } else {
+            // Если звук выключен — создаем и запускаем
+            audio = new Audio(`assets/${name}.mp3`);
+            audio.loop = true;
+            audio.volume = slider.value; // Устанавливаем громкость со слайдера
+            
+            audio.play()
+                .then(() => {
+                    card.classList.add('active');
+                })
+                .catch(err => {
+                    console.error(`Ошибка воспроизведения ${name}:`, err);
+                });
+        }
+    });
+
     soundsGrid.appendChild(card);
 });
-
-// Функция управления звуком
-function toggleSound(name, cardElement) {
-    // Если этот звук уже создан и проигрывается
-    if (activeAudios[name]) {
-        // Останавливаем и удаляем
-        activeAudios[name].pause();
-        delete activeAudios[name];
-        cardElement.classList.remove('active');
-    } else {
-        // Создаем новый аудио-объект
-        const audio = new Audio(`assets/${name}.mp3`);
-        audio.loop = true; // Зацикливаем воспроизведение
-        audio.volume = 0.5; // Громкость по умолчанию (50%)
-        
-        audio.play()
-            .then(() => {
-                activeAudios[name] = audio;
-                cardElement.classList.add('active');
-            })
-            .catch(err => {
-                console.error(`Ошибка воспроизведения звука ${name}:`, err);
-            });
-    }
-}

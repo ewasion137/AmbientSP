@@ -5,42 +5,80 @@
 }
 
 body {
-    background: #0f0f12; /* Темный глубокий фон */
+    background: #0c0c0e;
     color: #ffffff;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     display: flex;
-    justify-content: center;
-    align-items: flex-start;
+    flex-direction: column;
     min-height: 100vh;
-    padding: 40px 20px;
-    overflow-y: auto;
+    overflow: hidden;
     user-select: none;
 }
 
-.app-container {
+/* Кастомный верхний бар */
+.title-bar {
     width: 100%;
-    max-width: 1000px;
+    height: 40px;
+    background: #121216;
     display: flex;
-    flex-direction: column;
-    gap: 30px;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 16px;
+    -webkit-app-region: drag; /* Позволяет перетаскивать окно */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    z-index: 10;
 }
 
-header {
-    text-align: center;
-}
-
-.logo-text {
-    font-size: 2rem;
+.title-bar .logo-text {
+    font-size: 0.9rem;
     font-weight: 700;
-    letter-spacing: 2px;
+    letter-spacing: 1px;
+    color: #a0a0b0;
+}
+
+/* Кнопки управления окном */
+.window-controls {
+    display: flex;
+    gap: 6px;
+    -webkit-app-region: no-drag; /* Отменяет перетаскивание на кнопках, чтобы работал клик */
+}
+
+.control-btn {
+    background: transparent;
+    border: none;
+    color: #707080;
+    font-size: 0.8rem;
+    cursor: pointer;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, color 0.2s;
+}
+
+.control-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
     color: #ffffff;
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+.control-btn.close-btn:hover {
+    background: #e81123;
+    color: #ffffff;
+}
+
+/* Контентная зона */
+.app-container {
+    flex: 1;
+    padding: 30px;
+    overflow-y: auto;
 }
 
 /* Сетка карточек */
 .sounds-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    grid-template-columns: repeat(5, 1fr); /* Ровно 5 колонок для 10 звуков */
     gap: 20px;
     width: 100%;
 }
@@ -48,28 +86,26 @@ header {
 /* Карточка звука */
 .sound-card {
     position: relative;
-    height: 140px;
+    height: 150px;
     border-radius: 16px;
     overflow: hidden;
     cursor: pointer;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
     transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1), border-color 0.3s, box-shadow 0.3s;
 }
 
-/* Эффект при наведении */
 .sound-card:hover {
-    transform: scale(1.04);
-    border-color: rgba(255, 255, 255, 0.3);
+    transform: scale(1.03);
+    border-color: rgba(255, 255, 255, 0.2);
 }
 
-/* Активное состояние (когда звук играет) */
 .sound-card.active {
     border-color: #00ffcc;
-    box-shadow: 0 0 20px rgba(0, 255, 204, 0.3);
+    box-shadow: 0 0 15px rgba(0, 255, 204, 0.25);
 }
 
-/* Фоновая картинка с размытием по Гауссу */
+/* Фоновая картинка */
 .sound-bg {
     position: absolute;
     top: 0;
@@ -78,40 +114,88 @@ header {
     height: 100%;
     background-size: cover;
     background-position: center;
-    filter: blur(4px) brightness(0.4); /* Размытие + затемнение фона */
+    filter: blur(4px) brightness(0.35);
     transition: filter 0.3s ease;
     z-index: 1;
 }
 
-/* Когда карточка активна, картинка становится чуть четче и ярче */
 .sound-card.active .sound-bg {
-    filter: blur(2px) brightness(0.5);
+    filter: blur(2px) brightness(0.45);
 }
 
-/* Текст поверх картинки со свечением (Glow) */
+/* Текст названия */
 .sound-title {
     position: absolute;
-    top: 50%;
+    top: 40%;
     left: 50%;
     transform: translate(-50%, -50%);
     z-index: 2;
-    font-size: 1.15rem;
+    font-size: 1.1rem;
     font-weight: 600;
-    letter-spacing: 1px;
     text-align: center;
     width: 90%;
-    pointer-events: none; /* Чтобы клик проходил сквозь текст на карточку */
-    
+    pointer-events: none;
     color: #ffffff;
-    /* Дефолтное белое свечение */
-    text-shadow: 0 0 8px rgba(255, 255, 255, 0.6), 
-                 0 0 15px rgba(255, 255, 255, 0.3);
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
     transition: color 0.3s, text-shadow 0.3s;
 }
 
-/* Бирюзовое свечение при активации */
 .sound-card.active .sound-title {
     color: #00ffcc;
-    text-shadow: 0 0 10px rgba(0, 255, 204, 0.8), 
-                 0 0 20px rgba(0, 255, 204, 0.5);
+    text-shadow: 0 0 10px rgba(0, 255, 204, 0.7);
+}
+
+/* --- МИКШЕР (Слайдер громкости) --- */
+.volume-container {
+    position: absolute;
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    z-index: 3;
+    opacity: 0; /* Скрыт по умолчанию */
+    transition: opacity 0.25s ease;
+    display: flex;
+    justify-content: center;
+}
+
+/* Показываем слайдер при наведении ИЛИ если звук активен */
+.sound-card:hover .volume-container,
+.sound-card.active .volume-container {
+    opacity: 1;
+}
+
+.volume-slider {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.2);
+    outline: none;
+    cursor: pointer;
+}
+
+.sound-card.active .volume-slider {
+    background: rgba(0, 255, 204, 0.2);
+}
+
+/* Ползунок (кругляшок) */
+.volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #ffffff;
+    box-shadow: 0 0 4px rgba(0,0,0,0.5);
+    transition: transform 0.1s;
+}
+
+.sound-card.active .volume-slider::-webkit-slider-thumb {
+    background: #00ffcc;
+    box-shadow: 0 0 6px rgba(0, 255, 204, 0.8);
+}
+
+.volume-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
 }

@@ -7,12 +7,18 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+    <!-- Кастомный топ-бар -->
+    <div class="title-bar">
+        <div class="logo-text">AmbientSP</div>
+        <div class="window-controls">
+            <button class="control-btn" id="btnMinimize" title="Hide">&#9644;</button>
+            <button class="control-btn" id="btnTray" title="Tray">&#128455;</button>
+            <button class="control-btn close-btn" id="btnClose" title="Close">&#10006;</button>
+        </div>
+    </div>
+
+    <!-- Контейнер приложения -->
     <div class="app-container">
-        <header>
-            <h1 class="logo-text">AmbientSP</h1>
-        </header>
-        
-        <!-- Сетка со звуками -->
         <div class="sounds-grid" id="soundsGrid"></div>
     </div>
 
