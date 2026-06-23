@@ -240,6 +240,10 @@ body {
 
 /* Кнопка сброса */
 .reset-btn {
+    -webkit-app-region: no-drag; /* Строго отменяем drag на самой кнопке */
+    position: relative;          /* Выносим кнопку на верхний слой */
+    z-index: 15;                 /* Гарантируем, что драг-слой её не перекроет */
+    
     background: rgba(255, 255, 255, 0.02);
     border: 1px solid rgba(255, 255, 255, 0.08);
     color: #8a8a9a;
