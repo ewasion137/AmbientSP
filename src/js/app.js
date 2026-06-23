@@ -8,7 +8,8 @@ const soundNames = [
     'fire',
     'forest',
     'ocean',
-    'rain'
+    'rain',
+    'rain in car'
 ];
 
 const soundsGrid = document.getElementById('soundsGrid');

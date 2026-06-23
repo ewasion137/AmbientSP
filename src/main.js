@@ -7,7 +7,7 @@ let tray = null;
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 900,
-    height: 650,
+    height: 450,
     frame: false, // Отключаем стандартный топ-бар ОС
     resizable: false, // Запрещаем ресайз окна
     webPreferences: {
