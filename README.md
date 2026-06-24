@@ -16,11 +16,11 @@
 </p>
 
 <p align="center">
-  <a href="#key-features">Key Features</a> •
-  <a href="#how-it-looks">How It Looks</a> •
-  <a href="#available-sounds">Available Sounds</a> •
-  <a href="#installation">Installation</a> •
-  <a href="#building-from-source">Building</a>
+  <a href="##key-features">Key Features</a> •
+  <a href="##how-it-looks">How It Looks</a> •
+  <a href="##available-sounds">Available Sounds</a> •
+  <a href="##installation">Installation</a> •
+  <a href="##building-from-source">Building</a>
 </p>
 
 ---
