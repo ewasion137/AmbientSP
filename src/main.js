@@ -114,6 +114,12 @@ ipcMain.on('window-close', () => {
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
-    // Keep running in tray
+    app.quit(); // Теперь при Alt+F4 или выключении ПК приложение закроется чисто
+  }
+});
+
+app.on('before-quit', () => {
+  if (tray) {
+    tray.destroy(); // Чистим иконку из трея, чтобы она не висела фантомом
   }
 });
